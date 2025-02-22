@@ -1,0 +1,112 @@
+name: Docker Build and Deploy
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build-and-compose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ secrets.DOCKERHUB_REGISTRY }}
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      - name: Build and push Docker image
+        run: |
+          docker-compose up -d --build
+          docker-compose push
+
+      - name: Install Docker and Compose if not installed
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} <<EOF
+            if ! command -v docker &> /dev/null; then
+              echo "Docker not found. Installing..."
+              curl -fsSL https://get.docker.com | sh
+              sudo systemctl start docker
+              sudo systemctl enable docker
+            fi
+            if ! docker compose version &> /dev/null; then
+              echo "Docker Compose plugin not found. Installing..."
+              sudo apt-get update
+              sudo apt-get install -y docker-compose-plugin
+            fi
+          EOF
+
+      - name: Check and handle project directory
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -s" <<'EOF'
+            set -e
+            set -o pipefail
+
+            PROJECT_PATH="${{ secrets.PROJECT_PATH }}"
+            PROJECT_PATH=$(eval echo $PROJECT_PATH)
+
+            if [ -d "$PROJECT_PATH" ]; then
+              echo "Project directory exists: $PROJECT_PATH"
+              exit 0
+            else
+              echo "Project directory does not exist. Creating..."
+              mkdir -p "$PROJECT_PATH"
+            fi
+          EOF
+
+      - name: Copy docker-compose file to remote server
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no \
+          docker-compose.prod.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.PROJECT_PATH }}/docker-compose.yml
+
+      - name: delete unused images
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -s" <<EOF
+           docker image prune -a -f
+          EOF
+
+      - name: Pull compose with authentication
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no -T ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} <<'EOF'
+            set -e
+          
+            PROJECT_PATH=$(eval echo "${{ secrets.PROJECT_PATH }}")
+            cd "$PROJECT_PATH"
+            ls -lah  
+          
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "${{ secrets.DOCKERHUB_REGISTRY }}" -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          
+            docker compose pull
+          
+            docker logout "${{ secrets.DOCKERHUB_REGISTRY }}"
+          EOF
+
+      - name: Stop and remove existing containers on remote server (if exists)
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -s" <<EOF
+            PROJECT_PATH="${{ secrets.PROJECT_PATH }}"
+            PROJECT_PATH=\$(eval echo \$PROJECT_PATH) 
+
+            if [ -d "\$PROJECT_PATH" ]; then
+              cd "\$PROJECT_PATH" && docker compose down
+            fi
+          EOF
+
+      - name: Start containers on remote server
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            PROJECT_PATH=$(eval echo "${{ secrets.PROJECT_PATH }}")
+            cd "$PROJECT_PATH"
+            docker compose up -d
+          EOF

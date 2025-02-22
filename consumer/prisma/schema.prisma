@@ -1,0 +1,15 @@
+datasource db {
+  provider     = "postgresql"
+  url          = env("DB_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model LastSeqno {
+  id        Int      @id @default(autoincrement())
+  seqno     Int
+  updatedAt DateTime @updatedAt
+}

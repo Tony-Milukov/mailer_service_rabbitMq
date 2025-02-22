@@ -1,0 +1,14 @@
+{
+  "auths": {
+    "tonymilukov/gpt_app.backend": {
+      "auth": "dG9ueW1pbHVrb3Y6ZGNrcl9wYXRfb19xc3FmUUJLMXRrYzJzeDlQZkl4dmd0Smpj"
+    },
+    "index.docker.io": {
+      "auth": "dG9ueW1pbHVrb3Y6ZGNrcl9wYXRfb19xc3FmUUJLMXRrYzJzeDlQZkl4dmd0Smpj"
+    },
+    "ghcr.io": {
+      "auth": "VG9ueS1NaWx1a292OmdocF8wdmdQVUpUUnVDUU14QTk2UzkzeVhpYWVLRHdUcUs0YnRRWjI="
+    }
+  }
+}
+

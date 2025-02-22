@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  producer:
+    image: ghcr.io/tony-milukov/mailer_service/producer:latest
+    container_name: mail_services_producer
+    env_file:
+      - .env
+    ports:
+      - '${PORT}:${PORT}'
+    stdin_open: true
+  consumer:
+    image: ghcr.io/tony-milukov/mailer_service/consumer:latest
+    container_name: mail_services_consumer
+    env_file:
+      - .env
+    stdin_open: true

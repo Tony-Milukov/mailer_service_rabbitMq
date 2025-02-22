@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  producer:
+    image: ghcr.io/tony-milukov/mailer_service/producer:latest
+    container_name: mail_services_producer
+    build:
+      context: ./producer
+      dockerfile: Dockerfile
+    stdin_open: true
+    restart: unless-stopped
+
+  consumer:
+    image: ghcr.io/tony-milukov/mailer_service/consumer:latest
+    container_name: mail_services_consumer
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
+    stdin_open: true
+    restart: unless-stopped
