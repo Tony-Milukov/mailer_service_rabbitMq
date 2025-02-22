@@ -34,12 +34,13 @@ export class MailerService  {
             const templateBuffer = await this.minioService.streamToBuffer(templateStream)
             const templateTxt = templateBuffer.toString()
             const attachments = await this.getAttachmentsMinio(data.attachments)
+            const from = data.fromName ? `${data.fromName}<${this.mailAddress}>` : this.mailAddress
 
             await this.sendMail({
                 ...data,
                 template: templateTxt,
                 templateData: data.emailTemplateData,
-                from: `${data.fromName}<${this.mailAddress}>`,
+                from,
                 attachments
             })
     }
