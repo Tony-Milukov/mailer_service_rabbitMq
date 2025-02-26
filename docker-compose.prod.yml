@@ -4,6 +4,7 @@ services:
   producer:
     image: ghcr.io/tony-milukov/mailer_service/producer:latest
     container_name: mail_services_producer
+    restart: unless-stopped
     env_file:
       - .env
     ports:
@@ -12,6 +13,7 @@ services:
   consumer:
     image: ghcr.io/tony-milukov/mailer_service/consumer:latest
     container_name: mail_services_consumer
+    restart: unless-stopped
     env_file:
       - .env
     stdin_open: true
