@@ -3,13 +3,14 @@ import { EmailsService } from './emails.service';
 import { EmailsController } from './emails.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthInterceptor } from '../auth/auth.interceptor';
 import { AuthModule } from '../auth/auth.module';
 import { JwtModule } from '../jwt/jwt.module';
+import {MinioModule} from "../minio/minio.module";
 @Module({
   imports: [
     AuthModule,
     JwtModule,
+      MinioModule,
     ClientsModule.registerAsync([
       {
         name: 'MAILS',
