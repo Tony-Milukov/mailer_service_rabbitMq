@@ -1,8 +1,8 @@
-import { HttpException } from '@nestjs/common';
+import {CustomError} from "../errors";
 
-export class CustomError extends HttpException {
-  constructor(message: string, status: number) {
-    super(message, status);
+export class FileDoesNotExist extends CustomError {
+  constructor(message = "Provided file does not exist") {
+    super(message, 404);
   }
 }
 

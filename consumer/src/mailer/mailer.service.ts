@@ -1,18 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, OnModuleInit} from '@nestjs/common';
 import {SendMailDto} from "../consumer/dtos/sendMail.dto";
 import {MinioService} from "../minio/minio.service";
 import nodemailer, {Transporter} from "nodemailer"
-import SMTPTransport from "nodemailer/lib/smtp-transport";
 import {ConfigService} from "@nestjs/config";
 import {MailAttachment, MailDto} from "./dtos/mail.dto";
 import Mustache from 'mustache';
+import {FileDoesNotExist} from "./errors";
+
 @Injectable()
-export class MailerService  {
+export class MailerService implements OnModuleInit {
     constructor(
         private minioService: MinioService,
         private config: ConfigService,
-    ) {}
-    private transporter: Transporter<SMTPTransport.SentMessageInfo, SMTPTransport.Options>
+    ) {
+    }
+
+    private transporter: Transporter;
     private mailAddress: string;
 
     onModuleInit() {
@@ -30,19 +33,22 @@ export class MailerService  {
     }
 
     async sendMailByMinioTemplate(data: SendMailDto) {
-            const templateStream = await this.minioService.getFileByUrl(data.emailTemplateUrl)
-            const templateBuffer = await this.minioService.streamToBuffer(templateStream)
-            const templateTxt = templateBuffer.toString()
-            const attachments = await this.getAttachmentsMinio(data.attachments)
-            const from = data.fromName ? `${data.fromName}<${this.mailAddress}>` : this.mailAddress
+        const templateStream = await this.minioService.getFileByPath(data.emailTemplate)
+        if (!templateStream) {
+            throw new FileDoesNotExist()
+        }
+        const templateBuffer = await this.minioService.streamToBuffer(templateStream)
+        const templateTxt = templateBuffer.toString()
+        const attachments = await this.getAttachmentsMinio(data.attachments)
+        const from = data.fromName ? `${data.fromName}<${this.mailAddress}>` : this.mailAddress
 
-            await this.sendMail({
-                ...data,
-                template: templateTxt,
-                templateData: data.emailTemplateData,
-                from,
-                attachments
-            })
+        await this.sendMail({
+            ...data,
+            template: templateTxt,
+            templateData: data.emailTemplateData,
+            from,
+            attachments
+        })
     }
 
     async getAttachmentsMinio(attachmentUrls: string[]) {
@@ -50,23 +56,28 @@ export class MailerService  {
         const attachments: MailAttachment[] = [];
 
         for (const url of attachmentUrls) {
-            const [,filename] = this.minioService.getLocationDataByUrl(url)
-            const templateStream = await this.minioService.getFileByUrl(url)
-            const templateBuffer = await this.minioService.streamToBuffer(templateStream)
-            attachments.push({
-                filename,
-                content: templateBuffer
-            })
+            try {
+                const [, key] = this.minioService.getBucketAndKey(url)
+                const filename = this.minioService.getFileNameFromKey(key)
+                const templateStream = await this.minioService.getFileByPath(url)
+                const templateBuffer = await this.minioService.streamToBuffer(templateStream)
+                attachments.push({
+                    filename,
+                    content: templateBuffer
+                })
+            } catch (error) {
+                console.log(`Error fetching attachment from Minio: ${error.message}`);
+            }
         }
 
         return attachments
     }
 
     async sendMail(mail: MailDto) {
-            const mailHtml = Mustache.render(mail.template, mail.templateData);
-            await this.transporter.sendMail({
-                ...mail,
-                html: mailHtml,
-            });
+        const mailHtml = Mustache.render(mail.template, mail.templateData);
+        await this.transporter.sendMail({
+            ...mail,
+            html: mailHtml,
+        });
     }
 }

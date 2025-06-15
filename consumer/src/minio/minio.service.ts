@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as Minio from 'minio';
 import { v4 } from 'uuid';
+import {FileDoesNotExist} from "../mailer/errors";
 
 @Injectable()
 export class MinioService {
@@ -32,37 +33,48 @@ export class MinioService {
     );
   }
 
-  async uploadFile(
-    file: Express.Multer.File,
-    bucketName: string,
-    defaultFilename: string = null,
-  ): Promise<string> {
-      if (!file) {
-        throw new Error('File not found');
-      }
-      let fileName = `${v4()}.${file.originalname.split('.').pop()}`;
+    async uploadFile(
+        file: Express.Multer.File,
+        bucketName: string,
+        defaultFilename: string = null,
+    ): Promise<string> {
+        if (!file) {
+            throw new Error('File not found');
+        }
+        let fileName = `${v4()}/${file.originalname}`;
 
-      if (defaultFilename) {
-        fileName = defaultFilename;
-      }
+        if (defaultFilename) {
+            fileName = defaultFilename;
+        }
 
-      await this.saveFile(file, bucketName, fileName);
+        await this.saveFile(file, bucketName, fileName);
 
-      return `${bucketName}/${fileName}`;
+        return `${bucketName}/${fileName}`;
+    }
+
+  async getFileByPath(path: string) {
+     try {
+         const [bucketName, key] = this.getBucketAndKey(path);
+         return await this.minioClient.getObject(bucketName, key)
+     } catch (error) {
+            throw new FileDoesNotExist()
+     }
   }
 
-  async getFileByUrl(url: string) {
-    const [bucketName, fileName] = this.getLocationDataByUrl(url)
+   // Returns the bucket name and key from a path
+   // Example: "bucket-name/file-name" -> ["bucket-name", "key"]
+   getBucketAndKey (path: string) {
+        const parts =  path.split('/');
+        const bucket = parts.shift();
+        const key = parts.join('/');
+        return [bucket, key];
+    }
 
-    return await this.minioClient.getObject(bucketName, fileName);
-  }
+    getFileNameFromKey(key: string): string {
+      return key.split('/').pop();
+    }
 
-  getLocationDataByUrl (url: string) {
-      const path = (new URL(url)).pathname
-      return path.slice(1,).split('/');
-  }
-
-    async  streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
+    async streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
         const chunks: Buffer[] = [];
         return new Promise((resolve, reject) => {
             stream.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
