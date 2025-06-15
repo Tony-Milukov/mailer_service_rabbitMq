@@ -1,18 +1,35 @@
-import { Body, Controller, HttpException, HttpStatus, Inject, Post, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    HttpException,
+    HttpStatus,
+    Inject,
+    Post,
+    UploadedFiles,
+    UseInterceptors
+} from '@nestjs/common';
 import { SendMailDto } from './dtos/sendMail.dto';
 import {ClientProxy} from "@nestjs/microservices"
 import { EmailsService } from './emails.service';
 import { AuthInterceptor } from '../auth/auth.interceptor';
+import {FilesInterceptor} from "@nestjs/platform-express";
 
 @UseInterceptors(AuthInterceptor)
 @Controller('mailer')
 export class EmailsController {
-  constructor(private transactions: EmailsService) {}
+  constructor(private emailsService: EmailsService) {}
   @Post("/send")
   async send(@Body() data: SendMailDto) {
-        this.transactions.sendMail(data)
+        this.emailsService.sendMail(data)
         return {
             message: "Mail sent"
         }
   }
+
+    @Post('upload/attachments')
+    @UseInterceptors(FilesInterceptor('files'))
+    async uploadAttachments(@UploadedFiles() files: Express.Multer.File[]) {
+        const urls = await this.emailsService.uploadAttachments(files);
+        return { urls };
+    }
 }

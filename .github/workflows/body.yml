@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker-compose up -d --build
+          docker-compose build
           docker-compose push
 
       - name: Install Docker and Compose if not installed

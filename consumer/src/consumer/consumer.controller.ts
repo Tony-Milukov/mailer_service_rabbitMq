@@ -2,6 +2,7 @@ import {Controller, HttpException, HttpStatus} from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import {MailerService} from "../mailer/mailer.service";
 import {SendMailDto} from "./dtos/sendMail.dto";
+import {FileDoesNotExist} from "../mailer/errors";
 
 @Controller('consumer')
 export class ConsumerController {
@@ -15,7 +16,12 @@ export class ConsumerController {
       await this.mailerService.sendMailByMinioTemplate(data);
       channel.ack(originalMsg)
     } catch (error) {
-      console.log(error)
+      console.log('Error processing email:', error);
+
+      if (error instanceof FileDoesNotExist) {
+        channel.ack(originalMsg)
+        return;
+      }
       channel.nack(originalMsg)
     }
   }
