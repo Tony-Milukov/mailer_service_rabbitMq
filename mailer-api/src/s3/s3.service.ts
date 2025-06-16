@@ -69,4 +69,13 @@ export class S3Service implements OnModuleInit {
     getFileNameFromKey(key: string): string {
         return key.split('/').pop();
     }
+
+   async doesFileExist(bucketName: string, key: string): Promise<boolean> {
+    try {
+        await this.s3Client.statObject(bucketName, key);
+        return true;
+    } catch (error) {
+        return false
+    }
+  }
 }

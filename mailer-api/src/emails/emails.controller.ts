@@ -14,10 +14,10 @@ import {FilesInterceptor} from "@nestjs/platform-express";
 @Controller('mailer')
 export class EmailsController {
   constructor(private emailsService: EmailsService) {}
+
   @Post("/send")
   async send(@Body() data: SendMailDto) {
-        this.emailsService.sendMail(data)
-        return
+        await this.emailsService.sendMail(data)
   }
 
     @Post('upload/attachments')

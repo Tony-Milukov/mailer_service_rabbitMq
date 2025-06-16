@@ -1,8 +1,10 @@
 import {CustomError} from "../errors";
 
-export class FileDoesNotExist extends CustomError {
-  constructor(message = "Provided file does not exist") {
+export class TemplateDoesNotExist extends CustomError {
+  constructor(message = "Provided template does not exist") {
     super(message, 404);
   }
 }
+
+
 

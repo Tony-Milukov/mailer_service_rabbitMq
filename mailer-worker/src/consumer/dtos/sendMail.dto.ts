@@ -1,4 +1,4 @@
-import {IsString, IsNotEmpty, IsObject, IsArray, ArrayNotEmpty, IsOptional, ValidateIf} from 'class-validator'
+import {IsString, IsNotEmpty, IsObject, IsArray, ArrayNotEmpty, IsOptional, ValidateIf, IsNumber} from 'class-validator'
 
 export class SendMailDto {
   @IsString()
@@ -8,18 +8,6 @@ export class SendMailDto {
   @IsString()
   @IsNotEmpty()
   subject: string;
-
-  /**
-   * S3 file PATH.
-   * IF emailTemplateS3Path and emailTemplatePlain are both provided, emailTemplatePlain will be used.
-   * These file will be downloaded via MinIO and used as template of email.
-   * There can be variables in the email template that will be replaced with the values from emailTemplateData object
-   * Example: 'email-templates/template_123.html'
-   */
-  @ValidateIf(o => !o.emailTemplatePlain)
-  @IsString()
-  @IsNotEmpty()
-  emailTemplateS3Path: string;
 
   /**
    * These file will be downloaded via MinIO and used as template of email.
@@ -38,6 +26,28 @@ export class SendMailDto {
   @IsString()
   fromName: string;
 
+  /**
+   * S3 file PATH.
+   * IF emailTemplateS3Path and emailTemplatePlain are both provided, emailTemplatePlain will be used.
+   * These file will be downloaded via MinIO and used as template of email.
+   * There can be variables in the email template that will be replaced with the values from emailTemplateData object
+   * Example: 'email-templates/template_123.html'
+   */
+  @ValidateIf(o => !o.emailTemplateId && !o.emailTemplatePlain)
+  @IsString()
+  @IsNotEmpty()
+  emailTemplateS3Path: string;
+
+    /**
+     * Optional ID of the email template in the database.
+     * IF emailTemplateS3Path and emailTemplatePlain are both provided, emailTemplatePlain will be used.
+     * This will be used to fetch the email template from the database.
+     * There can be variables in the email template that will be replaced with the values from emailTemplateData object
+     */
+  @ValidateIf(o => !o.emailTemplateS3Path && !o.emailTemplatePlain)
+  @IsNotEmpty()
+  @IsNumber()
+  emailTemplateId: number;
 
   /**
    * .
@@ -45,7 +55,7 @@ export class SendMailDto {
    * IF emailTemplateS3Path and emailTemplatePlain are both provided, emailTemplatePlain will be used.
    * There can be variables in the email template that will be replaced with the values from emailTemplateData object
    */
-  @ValidateIf(o => !o.emailTemplateS3Path)
+  @ValidateIf(o => !o.emailTemplateS3Path && !o.emailTemplateId)
   @IsString()
   emailTemplatePlain: string;
 
