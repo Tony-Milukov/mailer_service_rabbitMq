@@ -1,9 +1,9 @@
 # compiled output
-producer/dist
-consumer/dist
+mailer-api/dist
+mailer-worker/dist
 
-consumer/node_modules
-producer/node_modules
+mailer-worker/node_modules
+mailer-api/node_modules
 
 # Logs
 logs

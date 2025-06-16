@@ -1,20 +1,20 @@
 version: '3.8'
 
 services:
-  producer:
-    image: ghcr.io/tony-milukov/mailer_service/producer:latest
-    container_name: mail_services_producer
+  mailer-api:
+    image: ghcr.io/tony-milukov/mailer_service/mailer-api:latest
+    container_name: mailer-api
     build:
-      context: ./producer
+      context: mailer-api
       dockerfile: Dockerfile
     stdin_open: true
     restart: unless-stopped
 
-  consumer:
-    image: ghcr.io/tony-milukov/mailer_service/consumer:latest
-    container_name: mail_services_consumer
+  mailer-worker:
+    image: ghcr.io/tony-milukov/mailer_service/mailer-worker:latest
+    container_name: mailer-worker
     build:
-      context: ./consumer
+      context: mailer-worker
       dockerfile: Dockerfile
     stdin_open: true
     restart: unless-stopped

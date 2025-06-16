@@ -1,18 +1,18 @@
 version: '3.8'
 
 services:
-  producer:
-    image: ghcr.io/tony-milukov/mailer_service/producer:latest
-    container_name: mail_services_producer
+  mailer-api:
+    image: ghcr.io/tony-milukov/mailer_service/mailer-api:latest
+    container_name: mailer-api
     restart: unless-stopped
     env_file:
       - .env
     ports:
       - '${PORT}:${PORT}'
     stdin_open: true
-  consumer:
-    image: ghcr.io/tony-milukov/mailer_service/consumer:latest
-    container_name: mail_services_consumer
+  mailer-worker:
+    image: ghcr.io/tony-milukov/mailer_service/mailer-worker:latest
+    container_name: mailer-worker
     restart: unless-stopped
     env_file:
       - .env
