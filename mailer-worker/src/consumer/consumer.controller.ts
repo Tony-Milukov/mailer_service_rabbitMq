@@ -13,7 +13,7 @@ export class ConsumerController {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
     try {
-      await this.mailerService.sendMailByMinioTemplate(data);
+      await this.mailerService.sendMailByTemplate(data);
       channel.ack(originalMsg)
     } catch (error) {
       console.log('Error processing email:', error);

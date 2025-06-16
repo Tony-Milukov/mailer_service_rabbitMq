@@ -5,12 +5,12 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { JwtModule } from '../jwt/jwt.module';
-import {MinioModule} from "../minio/minio.module";
+import {S3Module} from "../s3/s3.module";
 @Module({
   imports: [
     AuthModule,
     JwtModule,
-      MinioModule,
+      S3Module,
     ClientsModule.registerAsync([
       {
         name: 'MAILS',

@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnModuleInit} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {SendMailDto} from "./dtos/sendMail.dto";
-import {MinioService} from "../minio/minio.service";
+import {S3Service} from "../s3/s3.service";
 import {uuid} from "uuidv4";
 import {NoFilesProvided} from "./errors";
 import {v4} from "uuid";
@@ -10,7 +10,7 @@ import {v4} from "uuid";
 export class EmailsService implements OnModuleInit{
     constructor(
         @Inject("MAILS") private rabbitMq: ClientProxy,
-        private minioService: MinioService
+        private s3Service: S3Service
     ) {}
 
   async onModuleInit() {
@@ -30,11 +30,11 @@ export class EmailsService implements OnModuleInit{
             throw new NoFilesProvided()
         }
 
-        const bucketName = process.env.MINIO_EMAIL_ATTACHMENTS_BUCKET;
+        const bucketName = process.env.S3_EMAIL_ATTACHMENTS_BUCKET;
 
         return Promise.all(
             files.map(file => {
-                return this.minioService.uploadFile(file, bucketName);
+                return this.s3Service.uploadFile(file, bucketName);
             })
         );
 

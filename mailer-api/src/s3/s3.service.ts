@@ -3,16 +3,16 @@ import * as Minio from 'minio';
 import { v4 } from 'uuid';
 
 @Injectable()
-export class MinioService implements OnModuleInit {
-  minioClient: Minio.Client;
+export class S3Service implements OnModuleInit {
+  s3Client: Minio.Client;
 
   onModuleInit() {
-    this.minioClient = new Minio.Client({
-      endPoint: process.env.MINIO_HOST ?? 'localhost',
-      port: parseInt(process.env.MINIO_PORT) ?? 9000,
+    this.s3Client = new Minio.Client({
+      endPoint: process.env.S3_ENDPOINT ?? 'localhost',
+      port: process.env.S3_PORT ? parseInt(process.env.S3_PORT, 10) : 9000,
       useSSL: false,
-      accessKey: process.env.MINIO_ACCESS_KEY,
-      secretKey: process.env.MINIO_SECRET_KEY,
+      accessKey: process.env.S3_ACCESS_KEY,
+      secretKey: process.env.S3_SECRET_KEY,
     });
   }
 
@@ -21,7 +21,7 @@ export class MinioService implements OnModuleInit {
     bucketName: string,
     fileName: string,
   ) {
-    await this.minioClient.putObject(
+    await this.s3Client.putObject(
       bucketName,
       fileName,
       file.buffer,
@@ -51,12 +51,11 @@ export class MinioService implements OnModuleInit {
       return `${bucketName}/${fileName}`;
   }
 
-  async getFileByPath(path: string) {
-    const [bucketName, key] = this.getBucketAndKey(path);
-    const fileName = this.getFileNameFromKey(key);
+    async getFileByPath(path: string) {
+        const [bucketName, key] = this.getBucketAndKey(path);
 
-    return await this.minioClient.getObject(bucketName, fileName);
-  }
+        return await this.s3Client.getObject(bucketName, key);
+    }
 
     // Returns the bucket name and key from a path
     // Example: "bucket-name/file-name" -> ["bucket-name", "key"]
