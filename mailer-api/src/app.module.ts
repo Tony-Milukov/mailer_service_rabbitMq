@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import {EmailsModule} from "./emails/emails.module";
-import { MinioModule } from './minio/minio.module';
+import { S3Module } from './s3/s3.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -10,7 +10,7 @@ import { MinioModule } from './minio/minio.module';
     }),
     EmailsModule,
     AuthModule,
-    MinioModule,
+    S3Module,
   ]
 })
 export class AppModule {}

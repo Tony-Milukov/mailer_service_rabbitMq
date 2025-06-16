@@ -9,11 +9,11 @@ export class MinioService {
 
   onModuleInit() {
     this.minioClient = new Minio.Client({
-      endPoint: process.env.MINIO_HOST ?? 'localhost',
-      port: parseInt(process.env.MINIO_PORT) ?? 9000,
+      endPoint: process.env.S3_ENDPOINT ?? 'localhost',
+      port: parseInt(process.env.S3_PORT) ?? 9000,
       useSSL: false,
-      accessKey: process.env.MINIO_ACCESS_KEY,
-      secretKey: process.env.MINIO_SECRET_KEY,
+      accessKey: process.env.S3_ACCESS_KEY,
+      secretKey: process.env.S3_SECRET_KEY,
     });
   }
 

@@ -1,15 +1,11 @@
 import {
     Body,
     Controller,
-    HttpException,
-    HttpStatus,
-    Inject,
     Post,
     UploadedFiles,
     UseInterceptors
 } from '@nestjs/common';
 import { SendMailDto } from './dtos/sendMail.dto';
-import {ClientProxy} from "@nestjs/microservices"
 import { EmailsService } from './emails.service';
 import { AuthInterceptor } from '../auth/auth.interceptor';
 import {FilesInterceptor} from "@nestjs/platform-express";
@@ -21,9 +17,7 @@ export class EmailsController {
   @Post("/send")
   async send(@Body() data: SendMailDto) {
         this.emailsService.sendMail(data)
-        return {
-            message: "Mail sent"
-        }
+        return
   }
 
     @Post('upload/attachments')
