@@ -1,37 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, OnModuleInit} from '@nestjs/common';
 import * as Minio from 'minio';
 import { v4 } from 'uuid';
-import {FileDoesNotExist} from "../mailer/errors";
 
 @Injectable()
-export class MinioService {
-  minioClient: Minio.Client;
+export class S3Service implements OnModuleInit {
+    s3Client: Minio.Client;
 
-  onModuleInit() {
-    this.minioClient = new Minio.Client({
-      endPoint: process.env.S3_ENDPOINT ?? 'localhost',
-      port: parseInt(process.env.S3_PORT) ?? 9000,
-      useSSL: false,
-      accessKey: process.env.S3_ACCESS_KEY,
-      secretKey: process.env.S3_SECRET_KEY,
-    });
-  }
+    onModuleInit() {
+        this.s3Client = new Minio.Client({
+            endPoint: process.env.S3_ENDPOINT ?? 'localhost',
+            port: process.env.S3_PORT ? parseInt(process.env.S3_PORT, 10) : 9000,
+            useSSL: false,
+            accessKey: process.env.S3_ACCESS_KEY,
+            secretKey: process.env.S3_SECRET_KEY,
+        });
+    }
 
-  async saveFile(
-    file: Express.Multer.File,
-    bucketName: string,
-    fileName: string,
-  ) {
-    await this.minioClient.putObject(
-      bucketName,
-      fileName,
-      file.buffer,
-      file.size,
-      {
-        'Content-Type': file.mimetype,
-      },
-    );
-  }
+    async saveFile(
+        file: Express.Multer.File,
+        bucketName: string,
+        fileName: string,
+    ) {
+        await this.s3Client.putObject(
+            bucketName,
+            fileName,
+            file.buffer,
+            file.size,
+            {
+                'Content-Type': file.mimetype,
+            },
+        );
+    }
 
     async uploadFile(
         file: Express.Multer.File,
@@ -52,26 +51,31 @@ export class MinioService {
         return `${bucketName}/${fileName}`;
     }
 
-  async getFileByPath(path: string) {
-     try {
-         const [bucketName, key] = this.getBucketAndKey(path);
-         return await this.minioClient.getObject(bucketName, key)
-     } catch (error) {
-            throw new FileDoesNotExist()
-     }
-  }
+    async getFileByPath(path: string) {
+        const [bucketName, key] = this.getBucketAndKey(path);
 
-   // Returns the bucket name and key from a path
-   // Example: "bucket-name/file-name" -> ["bucket-name", "key"]
-   getBucketAndKey (path: string) {
+        return await this.s3Client.getObject(bucketName, key);
+    }
+
+    // Returns the bucket name and key from a path
+    // Example: "bucket-name/file-name" -> ["bucket-name", "key"]
+    getBucketAndKey (path: string) {
         const parts =  path.split('/');
         const bucket = parts.shift();
-        const key = parts.join('/');
-        return [bucket, key];
+        const fileName = parts.join('/');
+        return [bucket, fileName];
     }
 
     getFileNameFromKey(key: string): string {
-      return key.split('/').pop();
+        return key.split('/').pop();
+    }
+
+    async deleteFilesByKeys(bucket: string, keys: string[]): Promise<void> {
+        try {
+            await this.s3Client.removeObjects(bucket, keys);
+        } catch (error) {
+            console.error(`Error deleting file from S3: ${error.message}`);
+        }
     }
 
     async streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
