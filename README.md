@@ -111,8 +111,8 @@ The project relies on the following environment variables (e.g., using a `.env` 
 ```
 mailer_service/
 │
-├── producer/              # API to accept send/upload requests
-├── consumer/              # Worker for processing emails
+├── mailer-api/              # API to accept send/upload requests
+├── mailer-worker/              # Worker for processing emails
 ├── docker-compose.yml
 ├── README.md
 ```
