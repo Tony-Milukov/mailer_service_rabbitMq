@@ -5,7 +5,7 @@ import {uuid} from "uuidv4";
 import {NoFilesProvided} from "./errors";
 import {v4} from "uuid";
 import {TemplatesService} from "./templates/templates.service";
-import {SendMailReqDto} from "./dtos/sendMail.req.dto";
+import {SendMailReq} from "./dtos/sendMail.req";
 
 @Injectable()
 export class EmailsService implements OnModuleInit{
@@ -23,7 +23,7 @@ export class EmailsService implements OnModuleInit{
    }
   }
 
-  async sendMail(data: SendMailReqDto) {
+  async sendMail(data: SendMailReq) {
         // check if the data contains a template, and if it is valid
     await this.templateService.throwIfInvalidTemplate(data);
     this.rabbitMq.emit("email", data)

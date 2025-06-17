@@ -19,6 +19,7 @@ A scalable and flexible microservice for handling email delivery using pre-uploa
 ```bash
 git clone https://github.com/Tony-Milukov/mailer_service_rabbitMq.git
 cd mailer_service_rabbitMq
+fill .env with your environment variables
 docker-compose up --build
 ```
 
@@ -26,7 +27,7 @@ docker-compose up --build
 
 ---
 
-## 📦 SWAGGER API
+## 📦 Swagger Api
 The API documentation is available at:
 ``` http(s)://[APP]:[PORT]/api/docs```
 

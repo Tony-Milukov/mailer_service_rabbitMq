@@ -1,7 +1,7 @@
 import {IsString, IsNotEmpty, IsOptional, ValidateIf, IsNumber} from 'class-validator'
 import {ApiProperty} from "@nestjs/swagger";
 
-export class UpdateTemplateReqDto {
+export class UpdateTemplateReq {
   @ApiProperty()
   @ValidateIf((o) => !o.body)
   @IsString()

@@ -12,7 +12,7 @@ class AtLeastOneTemplate implements ValidatorConstraintInterface {
   }
 }
 
-export class SendMailReqDto {
+export class SendMailReq {
   @ApiProperty({ description: 'Recipient email address.' })
   @IsString()
   @IsNotEmpty()

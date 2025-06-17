@@ -1,7 +1,7 @@
 import {IsString, IsNotEmpty} from 'class-validator'
 import {ApiProperty} from "@nestjs/swagger";
 
-export class TemplateDto {
+export class Template {
     @ApiProperty({
         description: 'Name of the email template',
         example: 'Welcome Email',

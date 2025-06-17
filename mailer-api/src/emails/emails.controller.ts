@@ -10,7 +10,7 @@ import { AuthInterceptor } from '../auth/auth.interceptor';
 import {FilesInterceptor} from "@nestjs/platform-express";
 import {ApiBearerAuth, ApiConsumes, ApiCreatedResponse, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {UploadAttachmentsRes} from "./dtos/uploadAttachments.res.dto";
-import {SendMailReqDto} from "./dtos/sendMail.req.dto";
+import {SendMailReq} from "./dtos/sendMail.req";
 import {UploadAttachmentsReq} from "./dtos/uploadAttachments.req.dto";
 
 @ApiBearerAuth()
@@ -22,7 +22,7 @@ export class EmailsController {
   constructor(private emailsService: EmailsService) {}
 
   @Post("/send")
-  async send(@Body() data: SendMailReqDto) {
+  async send(@Body() data: SendMailReq) {
         await this.emailsService.sendMail(data)
   }
     @Post('upload/attachments')
