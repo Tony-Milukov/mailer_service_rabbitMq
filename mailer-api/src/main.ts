@@ -11,6 +11,7 @@ async function bootstrap() {
 
     const config = new DocumentBuilder()
         .setTitle('Mailer API')
+        .addBearerAuth()
         .build();
 
     const documentFactory = () => SwaggerModule.createDocument(app, config);

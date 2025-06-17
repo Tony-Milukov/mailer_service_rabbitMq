@@ -20,6 +20,10 @@ export class JwtService {
         jwtSecret = process.env.JWT_SECRET,
     ): Promise<boolean> {
         try {
+            if (!token) {
+                return false;
+            }
+
             return !!jwt.verify(token, jwtSecret);
         } catch (e) {
             return false;

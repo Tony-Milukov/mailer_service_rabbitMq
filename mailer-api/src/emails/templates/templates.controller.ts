@@ -2,11 +2,13 @@ import {Body, Controller, Delete, Get, Param, Patch, Post, UseInterceptors} from
 import {TemplatesService} from "./templates.service";
 import {UpdateTemplateReqDto} from "./dtos/updateTemplate.req.dto";
 import {CreateTemplate} from "./dtos/createTemplate.req.dto";
-import {ApiCreatedResponse, ApiProperty, ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiCreatedResponse, ApiProperty, ApiTags} from "@nestjs/swagger";
 import {AuthInterceptor} from "../../auth/auth.interceptor";
 import {TemplateDto} from "./dtos/template.dto";
 
+@ApiBearerAuth()
 @ApiTags('templates')
+
 @UseInterceptors(AuthInterceptor)
 @Controller('templates')
 export class TemplatesController {

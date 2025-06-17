@@ -10,6 +10,7 @@ A scalable and flexible microservice for handling email delivery using pre-uploa
 - 🧠 **Mustache-based dynamic templating**
 - 📂 Upload attachments via API
 - 🚀 Dockerized & CI-ready
+- 🔒 JWT authentication for secure API access, `Bearer token` required
 
 ---
 
@@ -25,56 +26,10 @@ docker-compose up --build
 
 ---
 
-## 📦 API Endpoints
+## 📦 SWAGGER API
+The API documentation is available at:
+``` http(s)://[APP]:[PORT]/api/docs```
 
-### `POST /api/mailer/send`
-
-Send an email:
-##### you can send an email with a `pre-uploaded HTML template` OR `plain text content`, and attachments.
-##### You can also use Mustache syntax for dynamic content in the HTML template or in plain text.
-##### If both `emailTemplateS3Path` and `emailTemplatePlain` are provided, the Plain Text template will be used.
-##### there is an option to delete attachments after sending the email, by default it is set to `true`.
-### Body:
-
-```json
-{
-  "to": "user@example.com",
-  "subject": "Welcome!",
-  "emailTemplateS3Path": "templates/welcome.html",
-  "emailTemplatePlain": "Welcome to our service {{name}!",
-  "emailTemplateData": {
-    "name": "Tony"
-  },
-  "fromName": "Mailer Service",
-  "deleteAttachmentsAfterSending": true,
-  "attachments": [
-    "mail-attachments/invoice_123.pdf"
-  ]
-}
-```
-
----
-
-### `POST /api/mailer/upload/attachments`
-
-Upload one or more files to S3 for use in future emails.
-
-#### FormData:
-
-```
-files: [File, File, ...]
-```
-
-#### Response:
-
-```json
-[
-  "attachments/file1.pdf",
-  "attachments/file2.png"
-]
-```
-
----
 
 ## 📦 Environment Variables
 
