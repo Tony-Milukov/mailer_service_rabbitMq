@@ -1,8 +1,8 @@
-import {Controller, HttpException, HttpStatus} from '@nestjs/common';
+import {Controller} from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import {MailerService} from "../mailer/mailer.service";
 import {SendMailDto} from "./dtos/sendMail.dto";
-import {FileDoesNotExist} from "../mailer/errors";
+import { TemplateDoesNotExist} from "../mailer/errors";
 
 @Controller('consumer')
 export class ConsumerController {
@@ -18,10 +18,11 @@ export class ConsumerController {
     } catch (error) {
       console.log('Error processing email:', error);
 
-      if (error instanceof FileDoesNotExist) {
+      if (error instanceof TemplateDoesNotExist) {
         channel.ack(originalMsg)
         return;
       }
+
       channel.nack(originalMsg)
     }
   }

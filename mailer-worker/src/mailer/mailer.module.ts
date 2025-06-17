@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MailerService } from './mailer.service';
 import {S3Module} from "../s3/s3.module";
-import {AttachmentModule} from "./attachment/attachment.module";
-import {TemplateModule} from "./template/template.module";
+import {AttachmentsModule} from "./attachments/attachments.module";
+import {TemplatesModule} from "./templates/templates.module";
 
 @Module({
   imports: [
     S3Module,
-    TemplateModule,
-    AttachmentModule
+    TemplatesModule,
+    AttachmentsModule
   ],
   providers: [MailerService],
   exports: [MailerService],

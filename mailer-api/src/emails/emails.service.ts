@@ -1,16 +1,18 @@
 import { Inject, Injectable, OnModuleInit} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import {SendMailDto} from "./dtos/sendMail.dto";
 import {S3Service} from "../s3/s3.service";
 import {uuid} from "uuidv4";
 import {NoFilesProvided} from "./errors";
 import {v4} from "uuid";
+import {TemplatesService} from "./templates/templates.service";
+import {SendMailReqDto} from "./dtos/sendMail.req.dto";
 
 @Injectable()
 export class EmailsService implements OnModuleInit{
     constructor(
         @Inject("MAILS") private rabbitMq: ClientProxy,
-        private s3Service: S3Service
+        private s3Service: S3Service,
+        private templateService: TemplatesService,
     ) {}
 
   async onModuleInit() {
@@ -21,7 +23,9 @@ export class EmailsService implements OnModuleInit{
    }
   }
 
-  sendMail(data: SendMailDto) {
+  async sendMail(data: SendMailReqDto) {
+        // check if the data contains a template, and if it is valid
+    await this.templateService.throwIfInvalidTemplate(data);
     this.rabbitMq.emit("email", data)
   }
 

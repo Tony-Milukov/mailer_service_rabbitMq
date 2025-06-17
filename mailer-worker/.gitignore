@@ -42,3 +42,4 @@ compose.yaml
 .eslintrc.js
 .prettierrc
 .DB_Store
+/generated/prisma

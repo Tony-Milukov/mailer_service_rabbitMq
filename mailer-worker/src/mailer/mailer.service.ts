@@ -4,15 +4,15 @@ import nodemailer, {Transporter} from "nodemailer"
 import {ConfigService} from "@nestjs/config";
 import {MailDto} from "./dtos/mail.dto";
 import Mustache from 'mustache';
-import {TemplateService} from "./template/template.service";
-import {AttachmentService} from "./attachment/attachment.service";
+import {TemplatesService} from "./templates/templates.service";
+import {AttachmentsService} from "./attachments/attachments.service";
 
 @Injectable()
 export class MailerService implements OnModuleInit {
     constructor(
         private config: ConfigService,
-        private readonly templateService: TemplateService,
-        private readonly attachmentService: AttachmentService
+        private readonly templateService: TemplatesService,
+        private readonly attachmentService: AttachmentsService
     ) {}
 
     private transporter: Transporter;
