@@ -1,19 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import {PrismaService} from "../../prisma/prisma.service";
-import {UpdateTemplateDto} from "./dtos/updateTemplateDto";
+import {UpdateTemplateReqDto} from "./dtos/updateTemplate.req.dto";
 import {NoIdProvided, TemplateDoesNotExist} from "./errors";
-import {SendMailDto} from "../dtos/sendMail.dto";
-import {CreateTemplateDto} from "./dtos/createTemplateDto";
+import {CreateTemplate} from "./dtos/createTemplate.req.dto";
 import {S3Service} from "../../s3/s3.service";
+import {SendMailReqDto} from "../dtos/sendMail.req.dto";
+import {TemplateDto} from "./dtos/template.dto";
 
 @Injectable()
-export class TemplateService {
+export class TemplatesService {
     constructor(
         private prismaService: PrismaService,
         private s3Service: S3Service,
     ) {}
 
-    async createTemplate(data: CreateTemplateDto) {
+    async createTemplate(data: CreateTemplate) {
         const { name, body } = data;
         return this.prismaService.mailTemplate.create({ data: {name, body} });
     }
@@ -22,7 +23,7 @@ export class TemplateService {
         return this.prismaService.mailTemplate.findUnique({ where: { id } });
     }
 
-    async updateTemplate(data: UpdateTemplateDto) {
+    async updateTemplate(data: UpdateTemplateReqDto) {
         const { id, name, body } = data;
 
         // Ensure the template exists before attempting to update it
@@ -53,11 +54,11 @@ export class TemplateService {
         return template;
     }
 
-    async getAllTemplates() {
+    async getAllTemplates(): Promise<TemplateDto[]> {
         return this.prismaService.mailTemplate.findMany();
     }
 
-    async throwIfInvalidTemplate(data: SendMailDto): Promise<void> {
+    async throwIfInvalidTemplate(data: SendMailReqDto): Promise<void> {
         if (data.emailTemplateId) {
             const template = await this.getTemplateOrThrow(data.emailTemplateId);
             if (!template?.body) throw new TemplateDoesNotExist();

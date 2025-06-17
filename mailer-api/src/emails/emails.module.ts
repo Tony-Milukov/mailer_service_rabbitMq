@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { JwtModule } from '../jwt/jwt.module';
 import {S3Module} from "../s3/s3.module";
-import { TemplateModule } from './template/template.module';
+import { TemplatesModule } from './templates/templates.module';
 @Module({
   imports: [
     AuthModule,
@@ -29,7 +29,7 @@ import { TemplateModule } from './template/template.module';
         }),
       },
     ]),
-    TemplateModule,
+    TemplatesModule,
   ],
   providers: [EmailsService],
   controllers: [EmailsController]

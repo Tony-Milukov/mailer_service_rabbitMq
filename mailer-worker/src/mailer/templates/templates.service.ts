@@ -5,7 +5,7 @@ import {S3Service} from "../../s3/s3.service";
 import {PrismaService} from "../../prisma/prisma.service";
 
 @Injectable()
-export class TemplateService {
+export class TemplatesService {
     constructor(
         private s3Service: S3Service,
         private prismaService: PrismaService,

@@ -6,6 +6,7 @@ A scalable and flexible microservice for handling email delivery using pre-uploa
 
 - 📨 **Async Email Queueing** via RabbitMQ
 - 🧰 **S3-powered Templates & Attachments**
+- 🗃️ **DB-powered Templates**
 - 🧠 **Mustache-based dynamic templating**
 - 📂 Upload attachments via API
 - 🚀 Dockerized & CI-ready
@@ -20,7 +21,7 @@ cd mailer_service_rabbitMq
 docker-compose up --build
 ```
 
-> The service includes two containers: `producer` and `consumer`
+> The service includes two containers: `mailer-api` and `mailer-worker`.
 
 ---
 
@@ -110,7 +111,12 @@ The project relies on the following environment variables (e.g., using a `.env` 
 |----------|---------------------------------|
 | `PORT`   | Port where the service runs     |
 
+### 🌐 Db
+| Variable           | Description                                                                                                  |
+|--------------------|--------------------------------------------------------------------------------------------------------------|
+| `DATABASE_URL`     | Database url for postgresql like in [prisma](https://www.prisma.io/docs/orm/reference/connection-urls) style |
 
+If you want to use other database types, such as `MySQL` or `MSSQL`, you can change the provider in the `prisma/schema.prisma` to match your database type and update the `DATABASE_URL` accordingly.
 ## 📁 Folder Structure (Simplified)
 
 ```

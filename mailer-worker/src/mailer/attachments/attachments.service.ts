@@ -3,7 +3,7 @@ import {MailAttachment} from "../dtos/mail.dto";
 import {S3Service} from "../../s3/s3.service";
 
 @Injectable()
-export class AttachmentService {
+export class AttachmentsService {
     constructor(private s3Service: S3Service) {}
 
     async deleteAttachmentsFromS3(attachmentUrls: string[]) {

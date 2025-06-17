@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TemplateService } from './template.service';
+import { TemplatesService } from './templates.service';
 import {S3Module} from "../../s3/s3.module";
 import {PrismaModule} from "../../prisma/prisma.module";
 
 @Module({
   imports: [S3Module, PrismaModule],
-  providers: [TemplateService],
-  exports: [TemplateService],
+  providers: [TemplatesService],
+  exports: [TemplatesService],
 })
-export class TemplateModule {}
+export class TemplatesModule {}
