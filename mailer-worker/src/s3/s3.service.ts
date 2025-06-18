@@ -1,10 +1,16 @@
 import {Injectable, OnModuleInit} from '@nestjs/common';
 import * as Minio from 'minio';
 import { v4 } from 'uuid';
+import {InjectPinoLogger, PinoLogger} from "nestjs-pino";
 
 @Injectable()
 export class S3Service implements OnModuleInit {
     s3Client: Minio.Client;
+
+    constructor(
+        @InjectPinoLogger(S3Service.name)
+        private readonly logger: PinoLogger
+    ) {}
 
     onModuleInit() {
         this.s3Client = new Minio.Client({
@@ -74,7 +80,7 @@ export class S3Service implements OnModuleInit {
         try {
             await this.s3Client.removeObjects(bucket, keys);
         } catch (error) {
-            console.error(`Error deleting file from S3: ${error.message}`);
+            this.logger.error(`Error deleting file from S3: ${error.message}`);
         }
     }
 

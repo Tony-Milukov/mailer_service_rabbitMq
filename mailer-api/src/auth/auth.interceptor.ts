@@ -28,9 +28,11 @@ export class AuthInterceptor implements NestInterceptor {
       const valid = await this.jwtService.verifyToken(token);
 
       if (!valid) {
+        this.logger.warn('JWT token is not valid');
         throw new UnauthorizedError();
       }
     } catch (e) {
+      this.logger.warn(e.message || e);
       throw new UnauthorizedError();
     }
 
