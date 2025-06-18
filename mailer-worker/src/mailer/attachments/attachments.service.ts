@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import {MailAttachment} from "../dtos/mail.dto";
 import {S3Service} from "../../s3/s3.service";
+import {InjectPinoLogger, PinoLogger} from "nestjs-pino";
 
 @Injectable()
 export class AttachmentsService {
-    constructor(private s3Service: S3Service) {}
+    constructor(
+        @InjectPinoLogger(AttachmentsService.name)
+        private readonly logger: PinoLogger,
+
+        private s3Service: S3Service
+    ) {}
 
     async deleteAttachmentsFromS3(attachmentUrls: string[]) {
         if (!attachmentUrls || !attachmentUrls.length) return;
@@ -24,7 +30,7 @@ export class AttachmentsService {
             try {
                 await this.s3Service.deleteFilesByKeys(bucketName, keys);
             } catch (error) {
-                console.error(`Error deleting files from S3: ${error.message}`);
+                this.logger.error(`Error deleting files from S3: ${error.message}`);
             }
         }
     }
@@ -45,7 +51,7 @@ export class AttachmentsService {
                     content: templateBuffer
                 })
             } catch (error) {
-                console.log(`Error fetching attachment from S3: ${error.message}`);
+                this.logger.error(`Error fetching attachment from S3: ${error.message}`);
             }
         }
 
