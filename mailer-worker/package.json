@@ -48,10 +48,7 @@
     "pg": "^8.12.0",
     "pino-pretty": "^13.0.0",
     "prisma": "^6.9.0",
-    "pupeteer": "^0.0.1",
     "puppeteer": "^23.2.1",
-    "tonweb": "^0.0.66",
-    "tonweb-mnemonic": "^1.0.1",
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {
