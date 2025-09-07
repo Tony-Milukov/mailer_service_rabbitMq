@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mailer-w-api:
+    build:
+      context: mailer-api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  mailer-w-worker:
+    build:
+      context: mailer-worker
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    restart: unless-stopped
