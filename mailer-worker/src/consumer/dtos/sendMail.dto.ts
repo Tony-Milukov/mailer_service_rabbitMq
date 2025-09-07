@@ -57,6 +57,7 @@ export class SendMailDto {
    */
   @ValidateIf(o => !o.emailTemplateS3Path && !o.emailTemplateId)
   @IsString()
+  @IsOptional()
   emailTemplatePlain: string;
 
   /**
@@ -77,4 +78,5 @@ export class SendMailDto {
    */
   @IsOptional()
   deleteAttachmentsAfterSending: boolean;
+
 }
