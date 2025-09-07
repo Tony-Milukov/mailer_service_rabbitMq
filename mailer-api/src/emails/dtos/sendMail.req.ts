@@ -61,6 +61,7 @@ export class SendMailReq {
   })
   @ValidateIf(o => !o.emailTemplateId)
   @IsString()
+  @IsOptional()
   emailTemplatePlain: string;
 
   @ApiProperty({
