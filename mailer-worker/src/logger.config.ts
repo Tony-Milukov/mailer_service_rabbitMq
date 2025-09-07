@@ -26,9 +26,12 @@ function getTransport() {
     const options: Options | any  = {
         target: 'pino-pretty',
         options: {
-            colorize : false,
-
-        }
+            colorize: true,
+            translateTime: 'SYS:HH:MM:ss.l',
+            singleLine: true,
+            levelFirst: true,
+            ignore: 'pid,hostname',
+        },
     };
 
     // if we are not on prod additional options:

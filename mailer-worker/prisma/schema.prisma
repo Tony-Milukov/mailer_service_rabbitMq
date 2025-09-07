@@ -14,3 +14,24 @@ model MailTemplate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model EmailTrace {
+  id                 String      @id @default(uuid())
+  to                 String
+  subject            String
+  templateId         Int?
+  templateS3Path     String?
+  emailTemplatePlain String?
+  data               Json
+  status             EmailStatus @default(PENDING)
+  error              String?
+  sentAt             DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
